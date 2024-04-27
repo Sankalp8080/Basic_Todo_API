@@ -1,0 +1,34 @@
+﻿create table UserTodoData 
+(
+slno int identity(1,1),
+userId int,
+task varchar(250),
+remainderDate datetime2,
+taskpriority int,
+createdt datetime,
+createrId int,
+modifyId int,
+modifydt datetime,
+deleteId int,
+daletedt datetime,
+markasdone int,
+uniquekey uniqueidentifier
+)
+
+ CREATE TABLE  [UserMast](
+	[slno] [int] identity(1,1),
+	[username] [varchar](50) NULL,
+	[firstname] [varchar](50) NULL,
+	[lastname] [varchar](50) NULL,
+	[email] [varchar](60) NULL,
+	uniquekey uniqueidentifier
+)
+alter table UserMast add isActive int
+
+create proc GetUserInfoById 
+(
+@slno int
+)
+as begin
+select slno, username, firstname, lastname, email, uniquekey from UserMast with (nolock) where slno =@slno and isActive = 1
+end

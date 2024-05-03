@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using SwaggerTest.Interface;
 using SwaggerTest.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -14,9 +15,11 @@ namespace SwaggerTest.Controllers
     public class LoginController : ControllerBase
     {
         private IConfiguration _configuration;
-        public LoginController (IConfiguration configuration)
+        private IUser _user;
+        public LoginController(IConfiguration configuration, IUser user)
         {
             _configuration = configuration;
+            _user = user;
         }
         [AllowAnonymous]
         [HttpPost]
@@ -27,7 +30,7 @@ namespace SwaggerTest.Controllers
             if (userDetail != null)
             {
                 var tokenString = GenerateToken(userDetail);
-                response = Ok(new {token= tokenString});
+                response = Ok(new { token = tokenString });
             }
             return response;
         }
@@ -45,21 +48,44 @@ namespace SwaggerTest.Controllers
         public string GenerateToken(UserIM user)
         {
             var sKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var cc= new SigningCredentials(sKey,SecurityAlgorithms.HmacSha256);
+            var cc = new SigningCredentials(sKey, SecurityAlgorithms.HmacSha256);
             var claim = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub,user.username)
-               
+
             };
             var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
                 _configuration["Jwt:Issuer"],
                 claim,
-                expires:DateTime.Now.AddDays(3),
-                signingCredentials:cc
+                expires: DateTime.Now.AddDays(3),
+                signingCredentials: cc
                 );
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+
+        [HttpGet("getuserlist")]
+        [Authorize]
+        public async Task<List<UserVM>> GetUserList()
+        {
+            try
+            {
+                return await _user.GetUserList();
+            }
+            catch { throw; }
+        }
+        [HttpPost("addupdateuser")]
+        [AllowAnonymous]
+        public async Task<int> AddUpdateUser([FromBody] UserIM userIM)
+        {
+            try
+            {
+              return await  _user.AddUpdateUserInfo(userIM);
+               
+            }catch { throw; }
+        }
+
     }
-    
-    
+
+
 }

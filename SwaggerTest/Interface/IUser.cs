@@ -4,10 +4,10 @@ namespace SwaggerTest.Interface
 {
     public interface IUser
     {
-        public List<UserVM> GetUserList();
-        public UserVM GetUserInfo(int id);
-        public void UpdateUserInfo(UserVM userVM);
-        public void AddUserInfo(UserVM userVM);
-        public UserVM DeleteUserInfo(int id);
+        public Task <List<UserVM>> GetUserList();
+        public Task<IEnumerable<UserVM>> GetUserInfo(int id);
+        
+        public Task<int> AddUpdateUserInfo(UserIM userIM);
+        public Task<int> DeleteUserInfo(int id);
     }
 }

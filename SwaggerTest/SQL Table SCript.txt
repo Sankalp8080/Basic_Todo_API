@@ -25,6 +25,10 @@ uniquekey uniqueidentifier
 )
 alter table UserMast add isActive int
 
+alter table usermast add createdt datetime2,createid int,modifiydt datetime2,modifyid int,delid int,deldt datetime2
+
+-----------------------------------
+GO
 create proc GetUserInfoById 
 (
 @slno int
@@ -32,3 +36,67 @@ create proc GetUserInfoById
 as begin
 select slno, username, firstname, lastname, email, uniquekey from UserMast with (nolock) where slno =@slno and isActive = 1
 end
+----------------------------------
+GO
+
+CREATE PROC GetUserList
+AS
+BEGIN
+	SELECT slno,username,firstname,lastname,email,uniquekey,isActive  FROM UserMast WITH(NOLOCK) WHERE isActive = 1
+END
+
+--------------------------------
+
+CREATE PROC AddUpdateUser(
+@slno int,
+@username varchar(50),
+@firstname varchar(50),
+@lastname varchar(50),
+@email varchar(50),
+@uniquekey uniqueidentifier,
+@isActive int,
+@password varchar(50)
+)
+AS
+BEGIN
+DECLARE @out int
+IF(@slno <> 0)
+	BEGIN
+		IF NOT EXISTS(SELECT 1 From UserMast WITH(NOLOCK) WHERE username = @username and slno =@slno and email=@email)
+			BEGIN
+				INSERT INTO UserMast (username,firstname,lastname,email,uniquekey,isActive,password, createdt) 
+				SELECT  @username,@firstname,@lastname,@email,@uniquekey,1,@password,GETDATE()
+				SET @out =1
+			END
+		SET @out = 2
+	END
+
+ELSE
+	BEGIN
+		IF EXISTS(SELECT 1 From UserMast WITH(NOLOCK) WHERE username = @username and slno =@slno and email=@email)
+			BEGIN
+				UPDATE UserMast SET username = @username,firstname =@firstname,lastname=@lastname,email=@email,password=@password,modifiydt=GETDATE() 
+				WHERE uniquekey =@uniquekey and slno =@slno
+				SET @out =3
+			END
+		 
+		ELSE
+			BEGIN
+				SET @out =4
+			END
+		SELECT @out
+END
+END
+ --------------------------------------------------
+ Go
+  CREATE PROC DeleteUser 
+ @slno int
+ AS
+ BEGIN
+	UPDATE UserMast SET deldt =GETDATE() ,isActive = 0 where slno =@slno 
+ END
+
+
+ --------------------------------------------
+  INSERT INTO UserMast (username,firstname,lastname,email,uniquekey,isActive,password, createdt) 
+  SELECT  'admin','admin','admin','admin@gmail.com','F8FA1F42-7119-4721-A5F1-A53134D79215',1,'admin@1234',GETDATE()

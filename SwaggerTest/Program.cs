@@ -13,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<IUser,UserRepository>();
+builder.Services.AddScoped<IUserToDo,UserToDoRepository>();
 builder.Services.AddDbContext<DatabaseDBContext>(opt=>opt.UseSqlServer(builder.Configuration.GetConnectionString("default")));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

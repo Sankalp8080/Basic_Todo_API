@@ -77,7 +77,7 @@ namespace SwaggerTest.Controllers
                     return data;
 
                 }
-                return null;
+                else return null;
             }
             catch { throw; }
         }
@@ -93,7 +93,7 @@ namespace SwaggerTest.Controllers
                     return 1;
 
                 }
-                return 0;
+                else return 0;
             }
             catch { throw; }
         }
@@ -109,7 +109,7 @@ namespace SwaggerTest.Controllers
                     return data;
 
                 }
-                return null;
+                else return null;
             }
             catch { throw; }
         }
@@ -126,7 +126,7 @@ namespace SwaggerTest.Controllers
                     return 1;
 
                 }
-                return 0;
+                else return 0;
             }
             catch { throw; }
         }

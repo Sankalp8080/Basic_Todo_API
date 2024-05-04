@@ -24,11 +24,14 @@ uniquekey uniqueidentifier
 	uniquekey uniqueidentifier
 )
 alter table UserMast add isActive int
+GO;
 
 alter table usermast add createdt datetime2,createid int,modifiydt datetime2,modifyid int,delid int,deldt datetime2
+GO;
 
 -----------------------------------
-GO
+GO;
+
 create proc GetUserInfoById 
 (
 @slno int
@@ -37,7 +40,8 @@ as begin
 select slno, username, firstname, lastname, email, uniquekey from UserMast with (nolock) where slno =@slno and isActive = 1
 end
 ----------------------------------
-GO
+GO;
+
 
 CREATE PROC GetUserList
 AS
@@ -46,6 +50,7 @@ BEGIN
 END
 
 --------------------------------
+GO;
 
 CREATE PROC AddUpdateUser(
 @slno int,
@@ -84,11 +89,13 @@ ELSE
 			BEGIN
 				SET @out =4
 			END
+END
 		SELECT @out
 END
-END
+
  --------------------------------------------------
- Go
+GO;
+
   CREATE PROC DeleteUser 
  @slno int
  AS
@@ -98,5 +105,74 @@ END
 
 
  --------------------------------------------
+ GO;
+
   INSERT INTO UserMast (username,firstname,lastname,email,uniquekey,isActive,password, createdt) 
   SELECT  'admin','admin','admin','admin@gmail.com','F8FA1F42-7119-4721-A5F1-A53134D79215',1,'admin@1234',GETDATE()
+
+  -----------------------------------------
+  GO;
+
+CREATE PROC GetAllTask
+@userid INT
+AS
+BEGIN
+	SELECT slno,task,remainderDate,taskpriority,userId,ISNULL(markasdone,0)as markasdone from UserTodoData WITH(NOLOCK) WHERE userId =@userid and markasdone is null and deleteId is null
+END
+---------------------------------------
+GO;
+
+CREATE PROC GetTaskById
+@slno INT,
+@userid INT
+AS
+BEGIN
+	SELECT slno,task,remainderDate,taskpriority,userId,ISNULL(markasdone,0)as markasdone from UserTodoData WITH(NOLOCK) WHERE userId =@userid and markasdone is null and slno=@slno and deleteId is null
+END
+--------------------------------------
+GO;
+
+CREATE PROC MarkAsDone
+@slno INT,
+@userid INT
+AS
+BEGIN
+	UPDATE UserTodoData SET markasdone =1 ,modifydt=GETDATE(),modifyId=@userid where slno=@slno and userId =@userid
+END
+-------------------------------------
+GO;
+
+ CREATE PROC DeleteTask
+@slno INT,
+@userid INT
+AS
+BEGIN
+	UPDATE UserTodoData SET deleteId=@userid,daletedt=GETDATE() where slno=@slno and userId =@userid
+END
+------------------------------------
+GO;
+
+CREATE PROC AddTask
+@userid INT,
+@task varchar(200),
+@remdate datetime2,
+@taskp int
+AS
+BEGIN
+	INSERT INTO UserTodoData (userId,task,taskpriority,remainderDate,createdt,createrId)
+	SELECT @userid,@task,@taskp,@remdate,GETDATE(),@userid
+END
+------------------------------------
+GO;
+
+CREATE PROC UpdateTask
+@userid INT,
+@task varchar(200),
+@remdate datetime2,
+@taskp int,
+@slno int
+AS
+BEGIN
+	UPDATE UserTodoData SET task=@task,taskpriority=@taskp,remainderDate=@remdate,modifydt=GETDATE(),modifyId=@userid
+	WHERE userId =@userid and slno =@slno
+END

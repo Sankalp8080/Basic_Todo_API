@@ -22,23 +22,7 @@ namespace SwaggerTest.Repository
             }
             catch { throw; }
         }
-        //public UserVM GetUser(int slno)
-        //{
-        //    try
-        //    {
-        //        UserVM? user = _dbContext.userVMs.Find(slno);
-        //        if (user != null)
-        //        {
-        //            return user;
-        //        }
-        //        else
-        //        {
-        //            throw new ArgumentException();
-        //        }
-
-        //    }
-        //    catch { throw; }
-        //}
+  
 
         public async Task<IEnumerable<UserVM>> GetUserInfo(int id)
         {

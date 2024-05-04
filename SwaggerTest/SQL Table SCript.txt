@@ -176,3 +176,11 @@ BEGIN
 	UPDATE UserTodoData SET task=@task,taskpriority=@taskp,remainderDate=@remdate,modifydt=GETDATE(),modifyId=@userid
 	WHERE userId =@userid and slno =@slno
 END
+----------------
+CREATE PROC CheckLogin --'admin@gmail.com','admin2@1234'
+@username varchar(200),
+@password varchar(200)
+AS
+BEGIN
+	SELECT 1 FROM UserMast WITH(NOLOCK) WHERE (username =@username and password =@password  and isActive = 1) or (email=@username and password=@password  and isActive = 1)
+END

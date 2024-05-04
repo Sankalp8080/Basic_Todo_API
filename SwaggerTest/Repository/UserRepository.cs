@@ -45,7 +45,7 @@ namespace SwaggerTest.Repository
             var param = new SqlParameter("@slno", id);
             try
             {
-                return await Task.Run(() => _dbContext.userVMs.FromSqlRaw("GetUserInfoById", param).ToListAsync());
+                return await Task.Run(() => _dbContext.userVMs.FromSqlRaw(@"exec GetUserInfoById @slno", param).ToListAsync());
             }
             catch { throw; }
         }
@@ -54,8 +54,8 @@ namespace SwaggerTest.Repository
         {
             var param = new List<SqlParameter>();
             var uniquekey = userIM.uniquekey == null ? Guid.NewGuid() : userIM.uniquekey;
-
-            param.Add(new SqlParameter("@slno", userIM.slno));
+            var slnoch = userIM.slno == 0 ? 0 : userIM.slno;
+            param.Add(new SqlParameter("@slno", slnoch));
             param.Add(new SqlParameter("@username", userIM.username));
             param.Add(new SqlParameter("@firstname", userIM.firstname));
             param.Add(new SqlParameter("@lastname", userIM.lastname));
@@ -65,15 +65,18 @@ namespace SwaggerTest.Repository
             param.Add(new SqlParameter("@password", userIM.password));
             try
             {
-                return await Task.Run(() => _dbContext.Database.ExecuteSqlRawAsync("AddUpdateUser", param.ToArray()));
+                   var res= await Task.Run(() => _dbContext.Database.ExecuteSqlRawAsync(@"exec AddUpdateUser @slno,@username,@firstname,@lastname,@email,@uniquekey,@isActive,@password", param.ToArray()));
+                return res;
             }
             catch { throw; }
         }
 
         public async Task<int> DeleteUserInfo(int slno)
         {
+            var param = new List<SqlParameter>();
+            param.Add(new SqlParameter("@slno", slno));
             try {
-                return await Task.Run(() =>_dbContext.Database.ExecuteSqlRawAsync("DeleteUser",slno));
+                return await Task.Run(() =>_dbContext.Database.ExecuteSqlRawAsync(@"exec DeleteUser @slno",param));
             }
             catch { throw; }
         }

@@ -7,6 +7,7 @@ using SwaggerTest.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SwaggerTest.Controllers
 {
@@ -70,19 +71,64 @@ namespace SwaggerTest.Controllers
         {
             try
             {
-                return await _user.GetUserList();
+                var data = await _user.GetUserList();
+                if (data != null)
+                {
+                    return data;
+
+                }
+                return null;
             }
             catch { throw; }
         }
         [HttpPost("addupdateuser")]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<int> AddUpdateUser([FromBody] UserIM userIM)
         {
             try
             {
-              return await  _user.AddUpdateUserInfo(userIM);
-               
-            }catch { throw; }
+                var data = await _user.AddUpdateUserInfo(userIM);
+                if (data == 1)
+                {
+                    return 1;
+
+                }
+                return 0;
+            }
+            catch { throw; }
+        }
+        [HttpPost("getuserbyid")]
+        [Authorize]
+        public async Task<IEnumerable<UserVM>> GetUserById(int id)
+        {
+            try
+            {
+                var data = await _user.GetUserInfo(id);
+                if (data != null)
+                {
+                    return data;
+
+                }
+                return null;
+            }
+            catch { throw; }
+        }
+
+        [HttpPost("deleteuser")]
+        [Authorize]
+        public async Task<int> DeleteUserbyId(int id)
+        {
+            try
+            {
+                var data = await _user.DeleteUserInfo(id);
+                if (data == 1)
+                {
+                    return 1;
+
+                }
+                return 0;
+            }
+            catch { throw; }
         }
 
     }

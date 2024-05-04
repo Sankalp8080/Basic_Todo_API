@@ -9,14 +9,14 @@ namespace SwaggerTest.Controllers
     [ApiController]
     public class UserToDoListController : Controller
     {
-      private readonly IUserToDo userToDo;
-       public UserToDoListController(IUserToDo _userToDo)
+        private readonly IUserToDo userToDo;
+        public UserToDoListController(IUserToDo _userToDo)
         {
             userToDo = _userToDo;
         }
 
         [HttpPost("getalltask")]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<List<UserToDoModelVM>> GetAllTask(int userid)
         {
             try
@@ -32,12 +32,12 @@ namespace SwaggerTest.Controllers
         }
 
         [HttpPost("gettaskbyid")]
-        [AllowAnonymous]
-        public async Task<IEnumerable<UserToDoModelVM>> GetTaskById(int id,int userid)
+        [Authorize]
+        public async Task<IEnumerable<UserToDoModelVM>> GetTaskById(int id, int userid)
         {
             try
             {
-                var data = await userToDo.GetTaskByID(id,userid);
+                var data = await userToDo.GetTaskByID(id, userid);
                 if (data != null)
                 {
                     return data;
@@ -48,8 +48,8 @@ namespace SwaggerTest.Controllers
             catch { throw; }
         }
         [HttpPost("addtask")]
-        [AllowAnonymous]
-        public async Task<int> AddTask([FromBody]UserToDoModelIM user)
+        [Authorize]
+        public async Task<int> AddTask([FromBody] UserToDoModelIM user)
         {
             try
             {
@@ -64,8 +64,8 @@ namespace SwaggerTest.Controllers
             catch { throw; }
         }
         [HttpPost("updatetask")]
-        [AllowAnonymous]
-        public async Task<int> UpdateTask([FromBody]UserToDoModelIM user)
+        [Authorize]
+        public async Task<int> UpdateTask([FromBody] UserToDoModelIM user)
         {
             try
             {
@@ -80,12 +80,12 @@ namespace SwaggerTest.Controllers
             catch { throw; }
         }
         [HttpPost("deletetask")]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<int> DeleteTask(int id, int userid)
         {
             try
             {
-                var data = await userToDo.DeleteTask(id,userid);
+                var data = await userToDo.DeleteTask(id, userid);
                 if (data == 1)
                 {
                     return 1;
@@ -96,12 +96,12 @@ namespace SwaggerTest.Controllers
             catch { throw; }
         }
         [HttpPost("markasdone")]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<int> MarkasDone(int id, int userid)
         {
             try
             {
-                var data = await userToDo.MarkAsDoneTask(id,userid);
+                var data = await userToDo.MarkAsDoneTask(id, userid);
                 if (data == 1)
                 {
                     return 1;
@@ -111,7 +111,7 @@ namespace SwaggerTest.Controllers
             }
             catch { throw; }
         }
-        
+
 
 
     }

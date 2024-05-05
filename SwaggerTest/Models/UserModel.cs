@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace SwaggerTest.Models
 {
@@ -26,5 +27,13 @@ namespace SwaggerTest.Models
         public Guid uniquekey { get; set; }
         public int isActive { get; set; }
 
+    }
+    [Keyless]
+    public class TokenModel
+    {
+       
+        public string? Token { get; set; }
+        public string? username { get; set; }
+        public string? email { get; set; }
     }
 }

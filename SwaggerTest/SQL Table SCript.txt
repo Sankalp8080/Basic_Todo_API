@@ -1,4 +1,6 @@
-﻿create table UserTodoData 
+﻿
+Use Basic_Todo
+create table UserTodoData 
 (
 slno int identity(1,1),
 userId int,
@@ -24,13 +26,19 @@ uniquekey uniqueidentifier
 	uniquekey uniqueidentifier
 )
 alter table UserMast add isActive int
-GO;
+go
+alter table UserMast add password varchar(200)
+Go
+alter table UserMast add Token nvarchar(1000)
+Go
+alter table UserMast add TokenDt datetime2
+Go
 
 alter table usermast add createdt datetime2,createid int,modifiydt datetime2,modifyid int,delid int,deldt datetime2
-GO;
+Go
 
 -----------------------------------
-GO;
+Go
 
 create proc GetUserInfoById 
 (
@@ -40,7 +48,7 @@ as begin
 select slno, username, firstname, lastname, email, uniquekey from UserMast with (nolock) where slno =@slno and isActive = 1
 end
 ----------------------------------
-GO;
+Go
 
 
 CREATE PROC GetUserList
@@ -50,7 +58,7 @@ BEGIN
 END
 
 --------------------------------
-GO;
+Go
 
 CREATE PROC AddUpdateUser(
 @slno int,
@@ -94,7 +102,7 @@ END
 END
 
  --------------------------------------------------
-GO;
+Go
 
   CREATE PROC DeleteUser 
  @slno int
@@ -105,13 +113,13 @@ GO;
 
 
  --------------------------------------------
- GO;
+ Go
 
   INSERT INTO UserMast (username,firstname,lastname,email,uniquekey,isActive,password, createdt) 
   SELECT  'admin','admin','admin','admin@gmail.com','F8FA1F42-7119-4721-A5F1-A53134D79215',1,'admin@1234',GETDATE()
 
   -----------------------------------------
-  GO;
+  Go
 
 CREATE PROC GetAllTask
 @userid INT
@@ -120,7 +128,7 @@ BEGIN
 	SELECT slno,task,remainderDate,taskpriority,userId,ISNULL(markasdone,0)as markasdone from UserTodoData WITH(NOLOCK) WHERE userId =@userid and markasdone is null and deleteId is null
 END
 ---------------------------------------
-GO;
+Go
 
 CREATE PROC GetTaskById
 @slno INT,
@@ -130,7 +138,7 @@ BEGIN
 	SELECT slno,task,remainderDate,taskpriority,userId,ISNULL(markasdone,0)as markasdone from UserTodoData WITH(NOLOCK) WHERE userId =@userid and markasdone is null and slno=@slno and deleteId is null
 END
 --------------------------------------
-GO;
+Go
 
 CREATE PROC MarkAsDone
 @slno INT,
@@ -140,7 +148,7 @@ BEGIN
 	UPDATE UserTodoData SET markasdone =1 ,modifydt=GETDATE(),modifyId=@userid where slno=@slno and userId =@userid
 END
 -------------------------------------
-GO;
+Go
 
  CREATE PROC DeleteTask
 @slno INT,
@@ -150,7 +158,7 @@ BEGIN
 	UPDATE UserTodoData SET deleteId=@userid,daletedt=GETDATE() where slno=@slno and userId =@userid
 END
 ------------------------------------
-GO;
+Go
 
 CREATE PROC AddTask
 @userid INT,
@@ -163,7 +171,7 @@ BEGIN
 	SELECT @userid,@task,@taskp,@remdate,GETDATE(),@userid
 END
 ------------------------------------
-GO;
+Go
 
 CREATE PROC UpdateTask
 @userid INT,
@@ -176,11 +184,27 @@ BEGIN
 	UPDATE UserTodoData SET task=@task,taskpriority=@taskp,remainderDate=@remdate,modifydt=GETDATE(),modifyId=@userid
 	WHERE userId =@userid and slno =@slno
 END
+Go
 ----------------
-CREATE PROC CheckLogin --'admin@gmail.com','admin2@1234'
+alter PROC CheckLogin  
 @username varchar(200),
 @password varchar(200)
 AS
 BEGIN
-	SELECT 1 FROM UserMast WITH(NOLOCK) WHERE (username =@username and password =@password  and isActive = 1) or (email=@username and password=@password  and isActive = 1)
+	SELECT slno,username,firstname,lastname,email,uniquekey,isActive FROM UserMast WITH(NOLOCK) WHERE (username =@username and password =@password  and isActive = 1) or (email=@username and password=@password  and isActive = 1)
 END
+
+go
+--------------------
+alter PROC StoreToken
+@username varchar(200),
+@token nvarchar(1000)
+AS
+BEGIN	
+	IF EXISTS (SELECT 1 FROM UserMast WITH(NOLOCK) where (username=@username AND  isActive =1) OR (email =@username AND isActive =1))
+	BEGIN
+		UPDATE UserMast SET Token =@token,tokendt=GETDATE()
+		WHERE (username=@username AND  isActive =1) OR (email =@username AND isActive =1)
+	END
+END
+GO

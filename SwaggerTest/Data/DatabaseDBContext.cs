@@ -16,6 +16,7 @@ namespace SwaggerTest.Data
         }
         public DbSet<UserIM> userIMs { get; set; }
         public DbSet<UserVM> userVMs { get; set; }
+        public DbSet<TokenModel> tokenModels { get; set; }
         public DbSet<UserToDoModelIM> userToDoModelsim { get; set;}
         public DbSet<UserToDoModelVM> userToDoModelsvm { get; set;}
     }

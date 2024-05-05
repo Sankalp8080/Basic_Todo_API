@@ -23,14 +23,18 @@ namespace SwaggerTest.Controllers
             _user = user;
         }
         [AllowAnonymous]
-        [HttpPost]
-        public IActionResult Login([FromBody] UserIM user)
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(string username, string password)
         {
             IActionResult response = Unauthorized();
-            var userDetail = AuthenticationUser(user);
-            if (userDetail != null)
+            var userDetail = await _user.CheckLogin(username, password);
+            if (userDetail.Count > 0)
             {
-                var tokenString = GenerateToken(userDetail);
+                var tokenString = GenerateToken(userDetail.FirstOrDefault());
+                if (!string.IsNullOrEmpty(tokenString))
+                {
+                    await _user.StoreToken(username, tokenString);
+                }
                 response = Ok(new { token = tokenString });
             }
             return response;
@@ -46,7 +50,7 @@ namespace SwaggerTest.Controllers
             return u;
         }
         [NonAction]
-        public string GenerateToken(UserIM user)
+        public string GenerateToken(UserVM user)
         {
             var sKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var cc = new SigningCredentials(sKey, SecurityAlgorithms.HmacSha256);
@@ -82,7 +86,7 @@ namespace SwaggerTest.Controllers
             catch { throw; }
         }
         [HttpPost("addupdateuser")]
-        [Authorize]
+
         public async Task<int> AddUpdateUser([FromBody] UserIM userIM)
         {
             try

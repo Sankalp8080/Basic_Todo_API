@@ -22,7 +22,7 @@ namespace SwaggerTest.Repository
             }
             catch { throw; }
         }
-  
+
 
         public async Task<IEnumerable<UserVM>> GetUserInfo(int id)
         {
@@ -49,7 +49,7 @@ namespace SwaggerTest.Repository
             param.Add(new SqlParameter("@password", userIM.password));
             try
             {
-                   var res= await Task.Run(() => _dbContext.Database.ExecuteSqlRawAsync(@"exec AddUpdateUser @slno,@username,@firstname,@lastname,@email,@uniquekey,@isActive,@password", param.ToArray()));
+                var res = await Task.Run(() => _dbContext.Database.ExecuteSqlRawAsync(@"exec AddUpdateUser @slno,@username,@firstname,@lastname,@email,@uniquekey,@isActive,@password", param.ToArray()));
                 return res;
             }
             catch { throw; }
@@ -59,8 +59,33 @@ namespace SwaggerTest.Repository
         {
             var param = new List<SqlParameter>();
             param.Add(new SqlParameter("@slno", slno));
-            try {
-                return await Task.Run(() =>_dbContext.Database.ExecuteSqlRawAsync(@"exec DeleteUser @slno",param));
+            try
+            {
+                return await Task.Run(() => _dbContext.Database.ExecuteSqlRawAsync(@"exec DeleteUser @slno", param));
+            }
+            catch { throw; }
+        }
+        public async Task<int> StoreToken(string username,string token)
+        {
+            var param = new List<SqlParameter>
+            {
+                new SqlParameter("@username", username),
+                new SqlParameter("@token", token)
+            };
+            try
+            {
+                return await Task.Run(() => _dbContext.Database.ExecuteSqlRawAsync(@"StoreToken @username,@token ", param));
+            }
+            catch { throw; }
+        }
+        public async Task<List<UserVM>> CheckLogin(string username, string password)
+        {
+            var param = new List<SqlParameter>();
+            param.Add(new SqlParameter("@username", username));
+            param.Add(new SqlParameter("@password", password));
+            try
+            {
+                return await  _dbContext.userVMs.FromSqlRaw<UserVM>(@"CheckLogin @username,@password ", param.ToArray()).ToListAsync();
             }
             catch { throw; }
         }

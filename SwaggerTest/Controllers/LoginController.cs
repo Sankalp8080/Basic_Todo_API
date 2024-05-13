@@ -27,15 +27,23 @@ namespace SwaggerTest.Controllers
         public async Task<IActionResult> Login(string username, string password)
         {
             IActionResult response = Unauthorized();
+            int result=0; 
             var userDetail = await _user.CheckLogin(username, password);
             if (userDetail.Count > 0)
             {
                 var tokenString = GenerateToken(userDetail.FirstOrDefault());
                 if (!string.IsNullOrEmpty(tokenString))
                 {
-                    await _user.StoreToken(username, tokenString);
+                    response = Ok(new { token = tokenString });
+
+                   result= await _user.StoreToken(username, tokenString);
+                    if(result != 0)
+                    {
+                        response = Ok(new { token = tokenString });
+                        return response;
+                    }
+                    
                 }
-                response = Ok(new { token = tokenString });
             }
             return response;
         }

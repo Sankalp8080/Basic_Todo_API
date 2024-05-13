@@ -191,20 +191,18 @@ alter PROC CheckLogin
 @password varchar(200)
 AS
 BEGIN
-	SELECT slno,username,firstname,lastname,email,uniquekey,isActive FROM UserMast WITH(NOLOCK) WHERE (username =@username and password =@password  and isActive = 1) or (email=@username and password=@password  and isActive = 1)
+	SELECT slno,username,firstname,lastname,email,uniquekey,isActive,TokenKey FROM UserMast WITH(NOLOCK) WHERE (username =@username and password =@password  and isActive = 1) or (email=@username and password=@password  and isActive = 1)
 END
 
 go
 --------------------
+
 alter PROC StoreToken
-@username varchar(200),
-@token nvarchar(1000)
+@username varchar(50),
+@token nvarchar(max)
 AS
-BEGIN	
-	IF EXISTS (SELECT 1 FROM UserMast WITH(NOLOCK) where (username=@username AND  isActive =1) OR (email =@username AND isActive =1))
-	BEGIN
-		UPDATE UserMast SET Token =@token,tokendt=GETDATE()
+BEGIN
+UPDATE UserMast SET TokenKey =@token ,tokendt=GETDATE()
 		WHERE (username=@username AND  isActive =1) OR (email =@username AND isActive =1)
-	END
 END
 GO
